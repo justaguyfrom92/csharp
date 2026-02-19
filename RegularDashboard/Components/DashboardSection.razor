@@ -1,0 +1,122 @@
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.SignalR.Client
+@implements IAsyncDisposable
+
+<button class="toggle-btn" @onclick="ToggleSection">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M3 12h18M3 6h18M3 18h18"/>
+    </svg>
+    @(_sectionVisible ? "Hide Section" : "Show Section")
+</button>
+
+<div class="collapsible-wrapper @(_sectionVisible ? "" : "hidden")" id="collapsible">
+    <div class="two-col">
+
+        <!-- Bar Chart -->
+        <div class="section-card">
+            <h2>Weekly Traffic</h2>
+            <div class="chart">
+                @foreach (var bar in _trafficBars)
+                {
+                    double pct = (double)bar.Value / _trafficMax * 100;
+                    <div class="bar-col">
+                        <div class="bar" style="height:@(pct.ToString("F1"))%"></div>
+                        <span class="bar-label">@bar.Day</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Activity Feed -->
+        <div class="section-card">
+            <h2>Recent Activity</h2>
+            <div class="activity-list">
+                @foreach (var item in _activityItems)
+                {
+                    <div class="activity-item">
+                        <div class="activity-dot" style="background:@item.Color"></div>
+                        <span>@((MarkupString)item.Description)</span>
+                        <span class="activity-time">@item.TimeAgo</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div id="statusBar">@_statusMessage</div>
+
+@code {
+    private HubConnection? _hub;
+    private bool _sectionVisible = true;
+    private string _statusMessage = "Connecting to SignalR…";
+
+    private record TrafficBar(string Day, int Value);
+    private record ActivityItem(string Color, string Description, string TimeAgo);
+
+    private readonly List<TrafficBar> _trafficBars =
+    [
+        new("Mon", 62), new("Tue", 48), new("Wed", 75),
+        new("Thu", 91), new("Fri", 83), new("Sat", 57), new("Sun", 69),
+    ];
+
+    private readonly List<ActivityItem> _activityItems =
+    [
+        new("#22c55e", "User <strong>alice@co.io</strong> signed up",       "2m ago"),
+        new("#7c3aed", "Deployment <strong>v2.4.1</strong> succeeded",       "17m ago"),
+        new("#f59e0b", "Alert: CPU spike on <strong>node-03</strong>",       "34m ago"),
+        new("#3b82f6", "Backup completed successfully",                      "1h ago"),
+        new("#ef4444", "Payment failed for <strong>order #8812</strong>",    "2h ago"),
+    ];
+
+    private int _trafficMax => _trafficBars.Max(b => b.Value);
+
+    protected override async Task OnInitializedAsync()
+    {
+        _hub = new HubConnectionBuilder()
+            .WithUrl("/dashboardHub")
+            .WithAutomaticReconnect()
+            .Build();
+
+        _hub.On<bool>("ReceiveSectionState", (visible) =>
+        {
+            _sectionVisible = visible;
+            _statusMessage  = $"Section {(visible ? "shown" : "hidden")} — synced via SignalR";
+            InvokeAsync(StateHasChanged);
+        });
+
+        _hub.Reconnecting += _ =>
+        {
+            _statusMessage = "Reconnecting…";
+            return InvokeAsync(StateHasChanged);
+        };
+
+        _hub.Reconnected += _ =>
+        {
+            _statusMessage = "Reconnected ✓";
+            return InvokeAsync(StateHasChanged);
+        };
+
+        _hub.Closed += _ =>
+        {
+            _statusMessage = "Disconnected";
+            return InvokeAsync(StateHasChanged);
+        };
+
+        await _hub.StartAsync();
+        _statusMessage = "Connected via SignalR ✓";
+    }
+
+    private async Task ToggleSection()
+    {
+        if (_hub?.State == HubConnectionState.Connected)
+            await _hub.InvokeAsync("ToggleSection");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_hub is not null)
+            await _hub.DisposeAsync();
+    }
+}
