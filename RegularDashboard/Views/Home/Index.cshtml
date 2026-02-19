@@ -1,0 +1,27 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Overview";
+}
+
+<div class="page-header">
+    <div>
+        <h1>Overview</h1>
+        <p>Live dashboard powered by SignalR</p>
+    </div>
+</div>
+
+<!-- Stat Cards (rendered by MVC/Razor) -->
+<div class="stats-grid">
+    @foreach (var card in Model.StatCards)
+    {
+        <div class="stat-card">
+            <div class="label">@card.Label</div>
+            <div class="value">@card.Value</div>
+            <div class="delta @(card.IsPositive ? "up" : "down")">@card.Delta</div>
+        </div>
+    }
+</div>
+
+<!-- Blazor component: toggle button + collapsible section use C# @onclick -->
+<component type="typeof(RegularDashboard.Components.DashboardSection)"
+           render-mode="InteractiveServer" />
