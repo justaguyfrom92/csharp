@@ -1,0 +1,172 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #0f1117;
+  color: #e2e8f0;
+  min-height: 100vh;
+}
+
+/* ── Topbar ──────────────────────────────── */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  height: 60px;
+  background: #161b27;
+  border-bottom: 1px solid #2d3748;
+}
+header .logo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: .5px;
+  color: #7c3aed;
+}
+.connection-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #ef4444;
+  transition: background .3s;
+}
+.connection-dot.connected { background: #22c55e; }
+
+/* ── Layout ──────────────────────────────── */
+main {
+  max-width: 1100px;
+  margin: 2.5rem auto;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── Page header ─────────────────────────── */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.page-header h1 { font-size: 1.5rem; font-weight: 700; }
+.page-header p  { color: #94a3b8; font-size: .9rem; margin-top: .25rem; }
+
+/* ── Toggle button ───────────────────────── */
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  padding: .6rem 1.25rem;
+  border: none;
+  border-radius: 8px;
+  background: #7c3aed;
+  color: #fff;
+  font-size: .9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s, transform .1s;
+  white-space: nowrap;
+}
+.toggle-btn:hover  { background: #6d28d9; }
+.toggle-btn:active { transform: scale(.97); }
+
+/* ── Stat cards ──────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+.stat-card {
+  background: #161b27;
+  border: 1px solid #2d3748;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+}
+.stat-card .label { color: #94a3b8; font-size: .78rem; text-transform: uppercase; letter-spacing: .8px; }
+.stat-card .value { font-size: 1.9rem; font-weight: 700; margin-top: .3rem; }
+.stat-card .delta { font-size: .8rem; margin-top: .2rem; }
+.stat-card .delta.up   { color: #22c55e; }
+.stat-card .delta.down { color: #ef4444; }
+
+/* ── Collapsible wrapper ─────────────────── */
+.collapsible-wrapper {
+  overflow: hidden;
+  transition: max-height .45s cubic-bezier(.4,0,.2,1), opacity .35s ease;
+  max-height: 600px;
+  opacity: 1;
+}
+.collapsible-wrapper.hidden {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Two-column grid ─────────────────────── */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+@media (max-width: 640px) {
+  .two-col { grid-template-columns: 1fr; }
+}
+
+/* ── Section cards ───────────────────────── */
+.section-card {
+  background: #161b27;
+  border: 1px solid #2d3748;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+.section-card h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  color: #cbd5e1;
+}
+
+/* ── Bar chart ───────────────────────────── */
+.chart {
+  display: flex;
+  align-items: flex-end;
+  gap: .75rem;
+  height: 140px;
+}
+.bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .4rem;
+  height: 100%;
+  justify-content: flex-end;
+}
+.bar {
+  width: 100%;
+  border-radius: 6px 6px 0 0;
+  background: linear-gradient(180deg, #7c3aed, #4f46e5);
+}
+.bar-label { font-size: .7rem; color: #64748b; }
+
+/* ── Activity feed ───────────────────────── */
+.activity-list { display: flex; flex-direction: column; gap: .75rem; }
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: .9rem;
+  padding: .75rem 1rem;
+  background: #0f1117;
+  border-radius: 8px;
+  font-size: .85rem;
+}
+.activity-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.activity-time { color: #64748b; margin-left: auto; white-space: nowrap; }
+
+/* ── Status bar ──────────────────────────── */
+#statusBar {
+  font-size: .8rem;
+  color: #64748b;
+  text-align: center;
+  padding: .5rem;
+}
